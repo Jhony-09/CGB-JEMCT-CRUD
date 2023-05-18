@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Componentes</ui:define>
+
+    <ui:define name="viewname">
+        <li>Componentes</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/crud">Componentes</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="grid crud-demo">
+                <div class="col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup>
+                                <p:commandButton value="New" icon="pi pi-plus" actionListener="#{componenteView.openNew}" update="manage-product-content" oncomplete="PF('manageProductDialog').show()" 
+                                    styleClass="ui-button-success" style="margin-right: .5rem" />
+                                <p:commandButton id="delete-products-button" value="#{componenteView.deleteButtonMessage}" icon="pi pi-trash" action="#{componenteView.deleteSelected}" 
+                                    styleClass="ui-button-danger" disabled="#{!componenteView.hasSelectedComponentes()}" update="@this :form:dt-componentes">
+                                    <p:confirm header="Confirmation" message="Delete the selected products?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dt-componentes" widgetVar="dtComponentes" var="componente" value="#{componenteView.componentes}" reflow="true" styleClass="products-table"
+                                selection="#{componenteView.selectedComponentes}" rowKey="#{componente.idComp}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                                <f:facet name="header">
+                                    <div class="products-table-header">
+                                        <span style="font-weight: bold">Manage Products</span>
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search"></i>
+                                            <p:inputText id="globalFilter" onkeyup="PF('dtComponentes').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+                            
+                                    <p:ajax event="rowSelect" update=":form:delete-products-button dt-componentes" />
+                                    <p:ajax event="rowUnselect" update=":form:delete-products-button dt-componentes" />
+                                    <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button dt-componentes" />
+                                    <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button dt-componentes" />
+                                    <p:ajax event="toggleSelect" update=":form:delete-products-button dt-componentes" />
+
+
+                                <p:column selectionMode="multiple" exportable="false"></p:column>
+                                <p:column exportable="false">
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column headerText="Code" sortBy="#{componente.idComp}" filterBy="#{componente.idComp}">
+                                    <h:outputText value="#{componente.idComp}" />
+                                </p:column>
+                                <p:column headerText="Name" sortBy="#{componente.nombreComp}" filterBy="#{componente.nombreComp}">
+                                    <h:outputText value="#{componente.nombreComp}" />
+                                </p:column>
+                                <p:column headerText="Price" sortBy="#{componente.precioComp}">
+                                    <h:outputText value="#{componente.precioComp}" style="font-weight: 700">
+                                        <f:convertNumber currencySymbol="$" type="currency" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Category" sortBy="#{componente.descripcionComp}" filterBy="#{componente.descripcionComp}">
+                                    <h:outputText value="#{componente.descripcionComp}" />
+                                </p:column>
+                                <p:column headerText="Stock" sortBy="#{componente.stockComp}" filterBy="#{componente.stockComp}">
+                                    <h:outputText styleClass="product-badge status-#{componente.stockComp >= 0 ? 'available' : 'unavailable'}" value="#{componente.stockComp}" />
+                                </p:column>
+                                
+                                <p:column exportable="false">
+                                    <p:commandButton icon="pi pi-pencil" update=":form:manage-product-content" oncomplete="PF('manageProductDialog').show()" 
+                                        styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                        <f:setPropertyActionListener value="#{componente}" target="#{componenteView.selectedComponente}" />
+                                    </p:commandButton>
+                                    <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProductDialog').show()" >
+                                        <f:setPropertyActionListener value="#{componente}" target="#{componenteView.selectedComponentes}" />
+                                    </p:commandButton>
+                                </p:column>
+                        </p:dataTable>
+
+                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageProductDialog" responsive="true" appendTo="@(body)">
+                            <p:outputPanel id="manage-product-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty componenteView.selectedComponente}">
+                                    <div class="field">
+                                        <p:outputLabel for="name">Componente</p:outputLabel>
+                                        <p:inputText id="name" value="#{componenteView.selectedComponente.nombreComp}" required="true" />
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="description">Descripcion</p:outputLabel>
+                                        <p:inputTextarea id="description" value="#{componenteView.selectedComponente.descripcionComp}" />
+                                    </div>
+                                    
+                                    <div class="formgrid grid">
+                                        <div class="field col">
+                                            <p:outputLabel for="price">Precio</p:outputLabel>
+                                            <p:inputNumber id="price" value="#{componenteView.selectedComponente.precioComp}" symbol=" USD" symbolPosition="s" 
+                                                decimalSeparator="." thousandSeparator="," />  
+                                        </div>
+                                        <div class="field col">
+                                            <p:outputLabel for="quantity">Stock</p:outputLabel>
+                                            <p:spinner id="quantity" min="0" value="#{componenteView.selectedComponente.stockComp}" />
+                                        </div>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{componenteView.saveComponente}" update="manage-product-content" process="manage-product-content @this" />
+                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()" class="ui-button-secondary" />
+                            </f:facet>
+                        </p:dialog> 
+
+                        <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300" message="Delete the product?" header="Confirm" severity="warn">
+                            <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{componenteView.deleteSelected}" process="@this" oncomplete="PF('deleteProductDialog').hide()"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteProductDialog').hide() " update="@this :form:dt-componentes" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
