@@ -9,11 +9,10 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ComponenteService {
+public class ComponenteService implements Serializable {
 
     private final WebTarget webTarget;
 
@@ -23,10 +22,7 @@ public class ComponenteService {
     }
 
     public List<Componente> getComponentes() {
-        Response response = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .get();
-
+        Response response = webTarget.path("/listar").request(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             return response.readEntity(new GenericType<List<Componente>>() {});
         } else {
@@ -47,60 +43,56 @@ public class ComponenteService {
         }
     }
 
-    public void borrarComponentes(List<Integer> ids) {
-        String idParam = ids.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+    public int borrarComponentes(Componente componente) {
+        int valor = 0;
+        try {
+            WebTarget target = webTarget.path("/eliminar").queryParam("idComp", componente.getIdComp());
+            Response response = target
+                    .request(MediaType.APPLICATION_JSON)
+                    .delete();
 
-        WebTarget target = webTarget.queryParam("ids", idParam);
-        Response response = target
-                .request(MediaType.APPLICATION_JSON)
-                .delete();
+            if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+               valor = 1;
+            }
 
-        if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
-            System.out.println("Componentes eliminados con éxito");
-        } else {
-            String errorMessage = response.readEntity(String.class);
-            throw new RuntimeException("Error al borrar los componentes: " + errorMessage);
+        }catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return valor;
     }
 
-    public void crearComponente(Componente componente) {
-        if (componente.getNombreComp().isEmpty() || componente.getDescripcionComp().isEmpty()) {
-            throw new RuntimeException("Ingrese el nombre y la descripción del componente");
-        }
+    public int crearComponente(Componente componente) {
+        int valor = 0;
+        try {
+            Response response = webTarget.path("/crear")
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(componente));
 
-        if (componente.getPrecioComp().compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Ingrese un precio válido");
-        }
+            if (Response.Status.CREATED.getStatusCode() == response.getStatus()) {
+               valor = 1;
+            }
 
-        Response response = webTarget
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(componente));
-
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-            System.out.println("Componente creado con éxito");
-        } else {
-            String errorMessage = response.readEntity(String.class);
-            throw new RuntimeException("Error al crear el componente: " + errorMessage);
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        return valor;
     }
 
-    public void actualizarComponente(Componente componente) {
-        if (componente.getIdComp() == 0) {
-            throw new RuntimeException("El componente no existe");
-        }
+    public int actualizarComponente(Componente componente) {
+        int valor = 0;
+        try {
+            Response response = webTarget.path("/actualizar")
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(componente));
 
-        Response response = webTarget.path(String.valueOf(componente.getIdComp()))
-                .request(MediaType.APPLICATION_JSON)
-                .put(Entity.json(componente));
-
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            System.out.println("Componente actualizado con éxito");
-        } else {
-            String errorMessage = response.readEntity(String.class);
-            throw new RuntimeException("Error al actualizar el componente: " + errorMessage);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                valor = 1;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        return valor;
     }
 }
 

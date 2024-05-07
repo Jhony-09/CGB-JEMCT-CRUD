@@ -5,131 +5,370 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="title">Componentes</ui:define>
-
     <ui:define name="viewname">
-        <li>Componentes</li>
-        <li><i class="pi pi-chevron-right"></i></li>
+        <li><i class="pi pi-home"/></li>
+        <li><i class="pi pi-chevron-right"/></li>
         <li>
-            <p:link outcome="/crud">Componentes</p:link>
+            <!--<p:link outcome="componentes">#{msg['bComponentes_path']}</p:link>-->
+        </li>
+        <!-- <li><p:outputPanel  rendered="#{componenteBean.view == 'L'}"><i class="pi pi-chevron-right"/></p:outputPanel> </li> -->
+        <li>
+           <!-- <p:link rendered="#{componenteBean.view == 'L'}" value="#{msg['bComponentes_log']}"/>-->
         </li>
     </ui:define>
 
     <ui:define name="content">
-        <h:form id="form">
-            <div class="grid crud-demo">
-                <div class="col-12">
-                    <div class="card">
-                        <p:growl id="messages" showDetail="true" />
 
-                        <p:toolbar styleClass="mb-4">
-                            <p:toolbarGroup>
-                                <p:commandButton value="New" icon="pi pi-plus" actionListener="#{componenteView.openNew}" update="manage-product-content" oncomplete="PF('manageProductDialog').show()" 
-                                    styleClass="ui-button-success" style="margin-right: .5rem" />
-                                <p:commandButton id="delete-products-button" value="#{componenteView.deleteButtonMessage}" icon="pi pi-trash" action="#{componenteView.deleteSelected}" 
-                                    styleClass="ui-button-danger" disabled="#{!componenteView.hasSelectedComponentes()}" update="@this :form:dt-componentes">
-                                    <p:confirm header="Confirmation" message="Delete the selected products?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
-                            </p:toolbarGroup>
-                        </p:toolbar>
+        <div class="grid">
 
-                        <p:dataTable id="dt-componentes" widgetVar="dtComponentes" var="componente" value="#{componenteView.componentes}" reflow="true" styleClass="products-table"
-                                selection="#{componenteView.selectedComponentes}" rowKey="#{componente.idComp}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+            <div class="ui-g-12">
+
+                <div class="card">
+
+                    <h:form id="formPath">
+                        <p:contextMenu>
+                            <p:menuitem>#{msg['bloqueo_click_derecho']}</p:menuitem>
+                        </p:contextMenu>
+                    </h:form>
+
+                    <h:form id="formCom">
+                        <p:outputPanel rendered="#{componenteBean.view == 'C'}">
+
+                            <div style="display:block; width:100%; height:10px; overflow:hidden;"></div>
+
+                            <p:growl id="messages" globalOnly="true" showDetail="true"/>
+
+                            <p:dataTable multiViewState="true"  id="dtCom" var="com" widgetVar="dtCom" value="#{componenteBean.componentes}" rows="10" paginator="true"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" reflow="true"
+                                         rowsPerPageTemplate="10,50,100" emptyMessage="#{msg['bComponentes_no_hay_para_mostrar']}" filteredValue="#{componenteBean.componentesFiltro}" >
+
                                 <f:facet name="header">
-                                    <div class="products-table-header">
-                                        <span style="font-weight: bold">Manage Products</span>
-                                        <span class="filter-container ui-input-icon-left">
-                                            <i class="pi pi-search"></i>
-                                            <p:inputText id="globalFilter" onkeyup="PF('dtComponentes').filter()" placeholder="Search" />
-                                        </span>
-                                    </div>
+                                    <p:outputPanel style="text-align: right;">
+                                        <div style="float:left;">
+                                            <p:outputLabel value="Buscar: " />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dtCom').filter()" style="width:150px;horiz-align: left;"/>
+                                        </div>
+                                        <p:commandButton  style="text-align:center;" actionListener="#{componenteBean.agregar()}"  title="Agregar" icon="pi pi-save"
+                                                         value="Agregar" update="formCom,formAgr" resetValues="true" />
+                                    </p:outputPanel>
                                 </f:facet>
-                            
-                                    <p:ajax event="rowSelect" update=":form:delete-products-button dt-componentes" />
-                                    <p:ajax event="rowUnselect" update=":form:delete-products-button dt-componentes" />
-                                    <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button dt-componentes" />
-                                    <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button dt-componentes" />
-                                    <p:ajax event="toggleSelect" update=":form:delete-products-button dt-componentes" />
 
+                                <p:column headerText="Nombre" filterBy="#{com.nombreComp}"
+                                          footerText="Nombre" filterMatchMode="contains">
+                                    <h:outputText  value="#{com.nombreComp}" />
+                                </p:column>
 
-                                <p:column selectionMode="multiple" exportable="false"></p:column>
-                                <p:column exportable="false">
-                                    <p:rowToggler />
+                                <p:column headerText="Descripción" filterBy="#{com.descripcionComp}"
+                                          footerText="Descripción" filterMatchMode="contains">
+                                    <h:outputText  value="#{com.descripcionComp}" />
                                 </p:column>
-                                <p:column headerText="Code" sortBy="#{componente.idComp}" filterBy="#{componente.idComp}">
-                                    <h:outputText value="#{componente.idComp}" />
-                                </p:column>
-                                <p:column headerText="Name" sortBy="#{componente.nombreComp}" filterBy="#{componente.nombreComp}">
-                                    <h:outputText value="#{componente.nombreComp}" />
-                                </p:column>
-                                <p:column headerText="Price" sortBy="#{componente.precioComp}">
-                                    <h:outputText value="#{componente.precioComp}" style="font-weight: 700">
-                                        <f:convertNumber currencySymbol="$" type="currency" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="Category" sortBy="#{componente.descripcionComp}" filterBy="#{componente.descripcionComp}">
-                                    <h:outputText value="#{componente.descripcionComp}" />
-                                </p:column>
-                                <p:column headerText="Stock" sortBy="#{componente.stockComp}" filterBy="#{componente.stockComp}">
-                                    <h:outputText styleClass="product-badge status-#{componente.stockComp >= 0 ? 'available' : 'unavailable'}" value="#{componente.stockComp}" />
-                                </p:column>
-                                
-                                <p:column exportable="false">
-                                    <p:commandButton icon="pi pi-pencil" update=":form:manage-product-content" oncomplete="PF('manageProductDialog').show()" 
-                                        styleClass="edit-button rounded-button ui-button-success" process="@this">
-                                        <f:setPropertyActionListener value="#{componente}" target="#{componenteView.selectedComponente}" />
-                                    </p:commandButton>
-                                    <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProductDialog').show()" >
-                                        <f:setPropertyActionListener value="#{componente}" target="#{componenteView.selectedComponentes}" />
-                                    </p:commandButton>
-                                </p:column>
-                        </p:dataTable>
 
-                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageProductDialog" responsive="true" appendTo="@(body)">
-                            <p:outputPanel id="manage-product-content" class="ui-fluid">
-                                <p:outputPanel rendered="#{not empty componenteView.selectedComponente}">
-                                    <div class="field">
-                                        <p:outputLabel for="name">Componente</p:outputLabel>
-                                        <p:inputText id="name" value="#{componenteView.selectedComponente.nombreComp}" required="true" />
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="description">Descripcion</p:outputLabel>
-                                        <p:inputTextarea id="description" value="#{componenteView.selectedComponente.descripcionComp}" />
-                                    </div>
-                                    
-                                    <div class="formgrid grid">
-                                        <div class="field col">
-                                            <p:outputLabel for="price">Precio</p:outputLabel>
-                                            <p:inputNumber id="price" value="#{componenteView.selectedComponente.precioComp}" symbol=" USD" symbolPosition="s" 
-                                                decimalSeparator="." thousandSeparator="," />  
+                                <p:column headerText="Precio" filterBy="#{com.precioComp}"
+                                          footerText="Precio" filterMatchMode="contains">
+                                    <h:outputText  value="#{com.precioComp}" />
+                                </p:column>
+
+                                <p:column headerText="Stock" filterBy="#{com.stockComp}"
+                                          footerText="Stock" filterMatchMode="contains">
+                                    <h:outputText  value="#{com.stockComp}" />
+                                </p:column>
+
+                                <p:column>
+                                    <p:menuButton value="Opciones">
+                                        <p:menuitem actionListener="#{componenteBean.mostrar(com, 'M')}" update="formCom,formMod"
+                                                    resetValues="true" icon="pi pi-pencil" title="Modificar" value="Modificar"/>
+                                        <p:menuitem actionListener="#{componenteBean.mostrar(com, 'E')}" update="formCom,formEli"
+                                                    resetValues="true" icon="pi pi-trash" title="Eliminar" value="Eliminar"/>
+                                    </p:menuButton>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:outputPanel>
+                    </h:form>
+
+                    <h:form id="formLog">
+                        <p:outputPanel rendered="#{componenteBean.view == 'L'}">
+                            <div style="display:block; width:100%; height:10px; overflow:hidden;"></div>
+
+                            <p:dataTable multiViewState="true"  id="dtComLog" var="log" widgetVar="dtComLog" value="#{componenteBean.logComponentes}" rows="10" paginator="true" styleClass="mydatatable"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}" reflow="true"
+                                         rowsPerPageTemplate="10,50,100" emptyMessage="#{msg['bComponentes_no_hay_para_mostrar']}" filteredValue="#{componenteBean.logComponentesFiltro}">
+
+                                <f:facet name="header">
+                                    <p:outputPanel style="text-align: right;">
+                                        <div style="float:left;">
+                                            <p:outputLabel value="#{msg['buscar']}: " />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dtComLog').filter()" style="width:150px;horiz-align: right"/>
                                         </div>
-                                        <div class="field col">
-                                            <p:outputLabel for="quantity">Stock</p:outputLabel>
-                                            <p:spinner id="quantity" min="0" value="#{componenteView.selectedComponente.stockComp}" />
+                                        <p:commandButton style="text-align:center;"  actionListener="#{componenteBean.back()}"  title="#{msg['regresar']}" icon="pi pi-angle-double-left"
+                                                         value="#{msg['regresar']}" styleClass="ui-button-danger" update="breadcrumb, formCom,formLog" resetValues="true" />
+                                    </p:outputPanel>
+                                </f:facet>
+
+                                <p:column headerText="#{msg['bComponentes_id']}" filterBy="#{log.idCom}"
+                                          footerText="#{msg['bComponentes_id']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.idCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_empresa']}" filterBy="#{log.idEmpCom}"
+                                          footerText="#{msg['bComponentes_empresa']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.idEmpCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_descripcion']}" filterBy="#{log.descripcionCom}"
+                                          footerText="#{msg['bComponentes_descripcion']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.descripcionCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_estado']}" filterBy="#{variablesBean.formatoSN(log.estadoCom)}"
+                                          footerText="#{msg['bComponentes_estado']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{variablesBean.formatoSN(log.estadoCom)}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_favorito']}" filterBy="#{variablesBean.formatoSN(log.favoritoCom)}"
+                                          footerText="#{msg['bComponentes_favorito']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{variablesBean.formatoSN(log.favoritoCom)}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_eliminado']}" filterBy="#{variablesBean.formatoSN(log.eliminadoCom)}"
+                                          footerText="#{msg['bComponentes_eliminado']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{variablesBean.formatoSN(log.eliminadoCom)}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_usuario']}" filterBy="#{log.usuarioCom}"
+                                          footerText="#{msg['bComponentes_usuario']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.usuarioCom}" />
+                                </p:column>
+                                <!-- fecha -->
+                                <p:column headerText="#{msg['bComponentes_fecha']}" filterBy="#{log.fechaCom}"
+                                          footerText="#{msg['bComponentes_fecha']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.fechaCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_ip']}" filterBy="#{log.ipCom}"
+                                          footerText="#{msg['bComponentes_ip']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.ipCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_udi']}" filterBy="#{log.udiLogCom}"
+                                          footerText="#{msg['bComponentes_udi']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.udiLogCom}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['bComponentes_fecha_log']}" filterBy="#{log.fechaLogCom}"
+                                          footerText="#{msg['bComponentes_fecha_log']}" filterMatchMode="contains">
+                                    <h:outputText  value="#{log.fechaLogCom}" />
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </h:form>
+
+                    <h:form id="formEli">
+                        <p:outputPanel rendered="#{componenteBean.view == 'E'}" styleClass="myfieldset" style="text-align: center;">
+                            <p:fieldset legend="Eliminar Componente" style="margin-bottom:10px;">
+                                <p:scrollPanel mode="native" styleClass="scroll"  id="eliPaiDet">
+
+                                    <div style="display:block; width:100%; height:10px; overflow:hidden;"></div>
+                                    <p:growl globalOnly="true" showDetail="true"/>
+
+                                    <div class="grid ui-fluid justify-content-center flex-column">
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="nomEli" required="true" disabled="true"
+                                                             requiredMessage="Debe Ingresar el nombre" maxlength="100" value="#{componenteBean.componente.nombreComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Nombre </p:outputLabel>
+                                                <p:message for="nomEli"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="desEli" required="true" disabled="true"
+                                                             requiredMessage="Debe ingresar la descripcion" maxlength="100" value="#{componenteBean.componente.descripcionComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Descripcion</p:outputLabel>
+                                                <p:message for="desEli"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="stockEli" required="true" disabled="true"
+                                                               requiredMessage="Debe ingresar el stock" value="#{componenteBean.componente.stockComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Stock</p:outputLabel>
+                                                <p:message for="stockEli"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="preEli" required="true" disabled="true"
+                                                               requiredMessage="Debe ingresar el precio"  value="#{componenteBean.componente.precioComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Precio</p:outputLabel>
+                                                <p:message for="preEli"/>
+                                            </span>
                                         </div>
                                     </div>
-                                </p:outputPanel>
-                            </p:outputPanel>
 
-                            <f:facet name="footer">
-                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{componenteView.saveComponente}" update="manage-product-content" process="manage-product-content @this" />
-                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()" class="ui-button-secondary" />
-                            </f:facet>
-                        </p:dialog> 
+                                </p:scrollPanel>
+                                <h:outputText rendered="#{componenteBean.flagEli == false}" value="¿Desea eliminar el componente?"/>
+                                <h:outputText style="color: red; font-weight: bold" rendered="#{componenteBean.flagEli == true}" value="#{msg['bintegridad_referencial']}"/>
+                                <p:separator/>
+                                <p:commandButton rendered="#{componenteBean.flagEli == false}" value="Eliminar" actionListener="#{componenteBean.eliminar}"  update="formEli, formCom" icon="pi pi-trash" />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="Cerrar" styleClass="ui-button-danger" process="@this" update="formEli, formCom" actionListener="#{componenteBean.back}" icon="pi pi-times"/>
+                            </p:fieldset>
+                        </p:outputPanel>
+                    </h:form>
 
-                        <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300" message="Delete the product?" header="Confirm" severity="warn">
-                            <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{componenteView.deleteSelected}" process="@this" oncomplete="PF('deleteProductDialog').hide()"/>
-                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('deleteProductDialog').hide() " update="@this :form:dt-componentes" />
-                        </p:confirmDialog>
+                    <h:form id="formMod">
+                        <p:outputPanel rendered="#{componenteBean.view == 'M'}" styleClass="myfieldset" style="text-align: center">
+                            <p:fieldset legend="Editar Componente" style="margin-bottom:10px;">
 
-                        <p:confirmDialog global="true" showEffect="fade" width="300">
-                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
-                        </p:confirmDialog>
-                    </div>
+                                <p:scrollPanel  mode="native" styleClass="scroll"  id="modPaiDet">
+
+                                    <div style="display:block; width:100%; height:10px; overflow:hidden;"></div>
+                                    <p:tooltip showEvent="focus" hideEvent="blur" />
+                                    <p:growl globalOnly="true" showDetail="true"/>
+
+                                    <div class="grid ui-fluid justify-content-center flex-column">
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="nomMod" required="true"
+                                                             requiredMessage="Debe Ingresar el nombre" maxlength="100" value="#{componenteBean.componente.nombreComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Nombre </p:outputLabel>
+                                                <p:message for="nomMod"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="desMod" required="true"
+                                                             requiredMessage="Debe ingresar la descripcion" maxlength="100" value="#{componenteBean.componente.descripcionComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Descripcion</p:outputLabel>
+                                                <p:message for="desMod"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="stockMod" required="true"
+                                                               requiredMessage="Debe ingresar el stock" value="#{componenteBean.componente.stockComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Stock</p:outputLabel>
+                                                <p:message for="stockMod"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="preMod" required="true"
+                                                               requiredMessage="Debe ingresar el precio"  value="#{componenteBean.componente.precioComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Precio</p:outputLabel>
+                                                <p:message for="preMod"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </p:scrollPanel>
+                                <p:separator/>
+
+                                <p:commandButton value="Editar" icon="pi pi-check-circle" update="formMod, formCom"  actionListener="#{componenteBean.modificar}"/>
+                                <p:spacer width="10"/>
+                                <p:commandButton value="Cerrar" styleClass="ui-button-danger" process="@this" update="formMod, formCom" actionListener="#{componenteBean.back}" icon="pi pi-times"/>
+                            </p:fieldset>
+                        </p:outputPanel>
+                    </h:form>
+
+                    <h:form id="formAgr">
+                        <p:outputPanel rendered="#{componenteBean.view == 'A'}" styleClass="myfieldset" style="text-align: center">
+                            <p:fieldset id="fieldsetAgr" legend="Agregar Componente" style="margin-bottom:10px;">
+                                <p:scrollPanel  mode="native" styleClass="scroll"  id="agrUsuDetalle">
+
+                                    <div style="display:block; width:100%; height:10px; overflow:hidden;"></div>
+                                    <p:tooltip showEvent="focus" hideEvent="blur" />
+                                    <p:growl globalOnly="true" showDetail="true"/>
+
+                                    <div class="grid ui-fluid justify-content-center flex-column">
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="nomAgr" required="true"
+                                                             requiredMessage="Debe Ingresar el nombre" maxlength="100" value="#{componenteBean.componente.nombreComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Nombre </p:outputLabel>
+                                                <p:message for="nomAgr"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputText id="desAgr" required="true"
+                                                             requiredMessage="Debe ingresar la descripcion" maxlength="100" value="#{componenteBean.componente.descripcionComp}">
+
+                                                </p:inputText>
+                                                <p:outputLabel for="@previous">Descripcion</p:outputLabel>
+                                                <p:message for="desAgr"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="stockAgr" required="true"
+                                                             requiredMessage="Debe ingresar el stock" value="#{componenteBean.componente.stockComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Stock</p:outputLabel>
+                                                <p:message for="stockAgr"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 lg:col-6 xl:col-4 m-auto">
+                                            <span class="ui-float-label">
+                                                <p:inputNumber id="preAgr" required="true"
+                                                             requiredMessage="Debe ingresar el precio"  value="#{componenteBean.componente.precioComp}">
+
+                                                </p:inputNumber>
+                                                <p:outputLabel for="@previous">Precio</p:outputLabel>
+                                                <p:message for="preAgr"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </p:scrollPanel>
+                                <p:separator/>
+
+                                <p:commandButton update="formAgr, formCom" actionListener="#{componenteBean.insertar}" icon="pi pi-check-circle" value="Agregar"/>
+                                <p:spacer width="10"/>
+                                <p:commandButton value="Cerrar" styleClass="ui-button-danger" process="@this" update="formAgr, formCom" actionListener="#{componenteBean.back}" icon="pi pi-times"/>
+                            </p:fieldset>
+                        </p:outputPanel>
+                    </h:form>
+
                 </div>
+
             </div>
-        </h:form>
+
+        </div>
 
     </ui:define>
 
