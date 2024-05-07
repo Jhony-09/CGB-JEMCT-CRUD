@@ -1,25 +1,47 @@
----------------------------------------------------------- ACTUALIZACIONES -----------------------------------------------------
+Proyecto Java Server Faces con PrimeFaces
 
----------------------------RECOMENDACION-----------------------
-Para visualizar una fila mayor de componentes porfavor ejecute el script para crear la base de datos y la tabla, tambien se
-adjunta una lista de componentes para agregarlas a la tabla.
------------------------------------------------------------------
+Este proyecto es una aplicación web desarrollada con Java Server Faces (JSF) y la biblioteca de componentes PrimeFaces. Proporciona funcionalidades CRUD (Crear, Leer, Actualizar, Eliminar) para administrar datos.
+Características
 
------------------------------------------------------- AGREGADO -----------------------------------------------
-En el método openNew() del bean ComponenteView, se inicializaron correctamente los campos del objeto selectedComponente. 
-Ahora, los campos nombreComp, descripcionComp, precioComp y stockComp se establecen con valores predeterminados adecuados.
+Interfaz de usuario amigable y responsive gracias a PrimeFaces
+Operaciones CRUD para agregar, modificar y eliminar registros
+Validación de formularios en el lado del cliente
+Paginación y ordenamiento de datos
+Diseño modular y escalable
 
-Se agregó el atributo required="true" al campo name en el formulario de creación y edición de componentes. 
-Esto garantiza que el campo debe ser completado antes de enviar el formulario.
+Tecnologías utilizadas
 
-Se utilizó el atributo update="manage-product-content" en el botón "Save" del formulario. 
-Esto permite actualizar el contenido del diálogo de administración del componente después de guardar los cambios, mostrando así los datos actualizados del componente guardado.
+Java Server Faces (JSF)
+PrimeFaces
+Java EE
+Maven
 
+Requisitos
 
------------------------------------------ ERRORES SOLUCIONADOS ---------------------------------------------------------
-Se a solucionado el error que impedia eliminar una lista de componentes seleccionados.
-Se a solucionado el error que impedia eliminar solamente un componente.
+Java Development Kit (JDK) 17
+Servidor de aplicaciones Glassfish
 
---------------------------------------- ERRORES FALTANTES POR SOLUCIONAR --------------------------------------------------
-Hace falta solucionar el error que impide editar un componente existente.
-Hace falta solucionar el error que impide que los datos llenados al crear un nuevo componente se envíe correctamente.
+Instalación
+
+Clona este repositorio
+Navega al directorio del proyecto
+Compila el proyecto con Maven: mvn clean package
+Despliega el archivo .war generado en Glassfish
+
+Uso
+Una vez que la aplicación esté en funcionamiento, podrás acceder a ella a través de la URL proporcionada por Glassfish (por ejemplo, http://localhost:8080/CGB-BanReservas-1.0-SNAPSHOT).
+La aplicación te permitirá:
+
+Ver una lista de registros existentes
+Agregar un nuevo registro
+Modificar un registro existente
+Eliminar un registro
+
+Contribución
+Si deseas contribuir a este proyecto, puedes seguir estos pasos:
+
+1. Haz un fork de este repositorio        
+2. Crea una nueva rama: git checkout -b nueva-funcionalidad
+3. Realiza tus cambios y commit: git commit -m "Agrega nueva funcionalidad"
+4. Envía tus cambios al repositorio remoto: git push origin nueva-funcionalidad
+5. Crea un nuevo Pull Request
